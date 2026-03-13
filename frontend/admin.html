@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administración de Dispositivos</title>
+    <!-- CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Estilos personalizados -->
+    <style>
+        .table-img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .action-btn {
+            margin: 0 2px;
+        }
+        #formularioSection {
+            transition: all 0.3s ease;
+        }
+        .card-header {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-cog me-2"></i>Panel de Administración
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">
+                            <i class="fas fa-home"></i> Ver Catálogo
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Mensajes de alerta -->
+        <div id="mensajeExito" class="alert alert-success alert-dismissible fade d-none" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            <span id="mensajeExitoTexto"></span>
+            <button type="button" class="btn-close" onclick="this.parentElement.classList.add('d-none')"></button>
+        </div>
+        
+        <div id="mensajeError" class="alert alert-danger alert-dismissible fade d-none" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <span id="mensajeErrorTexto"></span>
+            <button type="button" class="btn-close" onclick="this.parentElement.classList.add('d-none')"></button>
+        </div>
+
+        <!-- Título y botón para nuevo dispositivo -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="fas fa-edit me-2"></i>Gestión de Dispositivos
+            </h2>
+            <button class="btn btn-success" id="btnNuevoDispositivo" data-bs-toggle="collapse" data-bs-target="#formularioSection">
+                <i class="fas fa-plus-circle me-2"></i>Nuevo Dispositivo
+            </button>
+        </div>
+
+        <!-- Formulario para agregar/editar -->
+        <div class="collapse show" id="formularioSection">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white" id="formularioHeader">
+                    <h5 class="mb-0">
+                        <i class="fas fa-plus-circle me-2"></i>
+                        <span id="formTitulo">Agregar Nuevo Dispositivo</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="formDispositivo">
+                        <input type="hidden" id="dispositivoId" value="">
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nombre *</label>
+                                <input type="text" class="form-control" id="nombre" required maxlength="200">
+                                <small class="text-muted">Máximo 200 caracteres</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Marca *</label>
+                                <input type="text" class="form-control" id="marca" required maxlength="100">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Tipo *</label>
+                                <select class="form-select" id="tipo" required>
+                                    <option value="">Seleccione...</option>
+                                    <option value="Celular">Celular</option>
+                                    <option value="Portátil">Portátil</option>
+                                    <option value="Tablet">Tablet</option>
+                                    <option value="Smartwatch">Smartwatch</option>
+                                    <option value="Auriculares">Auriculares</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Fecha de Lanzamiento</label>
+                                <input type="date" class="form-control" id="fecha_lanzamiento">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Precio*</label>
+                                <input type="number" step="0.01" min="0" class="form-control" id="precio" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">URL de Imagen</label>
+                            <input type="url" class="form-control" id="imagen_url" placeholder="https://ejemplo.com/imagen.jpg">
+                            <small class="text-muted">Dejar vacío para usar imagen por defecto</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Descripción</label>
+                            <textarea class="form-control" id="descripcion" rows="3" maxlength="1000"></textarea>
+                            <small class="text-muted">Máximo 1000 caracteres</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Especificaciones Técnicas</label>
+                            <textarea class="form-control" id="especificaciones" rows="3" placeholder="Procesador, RAM, almacenamiento, etc."></textarea>
+                        </div>
+
+                        <hr>
+                        
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-secondary" id="btnCancelar" onclick="cancelarEdicion()">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </button>
+                            <button type="submit" class="btn btn-primary" id="btnGuardar">
+                                <i class="fas fa-save me-2"></i>Guardar Dispositivo
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de dispositivos -->
+        <div class="card shadow">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i>Dispositivos Registrados
+                </h5>
+                <div class="d-flex">
+                    <input type="text" class="form-control form-control-sm me-2" id="buscarTabla" placeholder="Buscar en tabla..." style="width: 200px;">
+                    <button class="btn btn-sm btn-light" onclick="cargarDispositivos()">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Imagen</th>
+                                <th>Nombre</th>
+                                <th>Marca</th>
+                                <th>Tipo</th>
+                                <th>Precio</th>
+                                <th>Fecha Lanz.</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaDispositivos">
+                            <tr>
+                                <td colspan="8" class="text-center">
+                                    <div class="spinner-border text-primary my-3" role="status">
+                                        <span class="visually-hidden">Cargando...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- confirmacióneliminar -->
+    <div class="modal fade" id="modalEliminar" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Confirmar Eliminación
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas eliminar el dispositivo <strong id="dispositivoEliminarNombre"></strong>?</p>
+                    <p class="text-danger"><small>Esta acción no se puede deshacer. También se eliminarán todos los comentarios asociados.</small></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="btnConfirmarEliminar">
+                        <i class="fas fa-trash me-2"></i>Sí, eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>
