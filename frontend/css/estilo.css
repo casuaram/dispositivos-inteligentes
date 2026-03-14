@@ -1,7 +1,7 @@
 /* frontend/css/estilo.css */
 body {
-    background-color: #121212; 
-    color: #ffffff; 
+    background-color: #99aad8; 
+    color: #302e2e; 
     min-height: 100vh;
     display: flex;
     flex-direction: column;
