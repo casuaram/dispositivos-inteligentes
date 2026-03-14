@@ -6,29 +6,77 @@ const ComentarioController = {
         try {
             this.dispositivoActual = dispositivoId;
             
-            console.log(`📥 Cargando comentarios para dispositivo ${dispositivoId}`);
+            console.log('📥 Cargando comentarios para dispositivo:', dispositivoId);
             
-            const comentarios = await ComentarioService.getComentarios(dispositivoId);
-            
-            console.log(`📤 ${comentarios.length} comentarios cargados`);
-            
-            // Mostrar sección de comentarios
             const seccion = document.getElementById('seccion-comentarios');
             if (seccion) {
                 seccion.style.display = 'block';
-            } else {
-                console.warn('⚠️ Sección de comentarios no encontrada en el HTML');
+            }
+            
+            const contenedor = document.getElementById('lista-comentarios');
+            if (!contenedor) {
+                console.error('❌ No se encontró #lista-comentarios');
                 return;
             }
             
-            // Renderizar comentarios
-            ComentarioView.renderComentarios(comentarios);
+            contenedor.innerHTML = '<div class="text-center">Cargando comentarios...</div>';
             
-            // Configurar formulario
+            // Verificar que la clase Comentario existe
+            if (typeof Comentario === 'undefined') {
+                throw new Error('La clase Comentario no está definida');
+            }
+            
+            const comentarios = await ComentarioService.getComentarios(dispositivoId);
+            
+            console.log('📤 Comentarios recibidos:', comentarios);
+            
+            if (!comentarios || comentarios.length === 0) {
+                contenedor.innerHTML = `
+                    <div class="alert alert-info text-center">
+                        <i class="fas fa-comments fa-2x mb-3"></i>
+                        <p class="mb-0">No hay comentarios aún. ¡Sé el primero en comentar!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Mostrar comentarios
+            let html = '';
+            comentarios.forEach(com => {
+                html += `
+                    <div class="card mb-3">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>${this.escapeHTML(com.nombre_usuario)}</strong>
+                                <small class="text-muted ms-2">${this.formatearFecha(com.fecha)}</small>
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-warning" onclick="ComentarioController.editarComentario(${com.id})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="ComentarioController.confirmarEliminar(${com.id}, '${this.escapeHTML(com.nombre_usuario)}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">${this.escapeHTML(com.comentario)}</p>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            contenedor.innerHTML = html;
+            
             this.configurarFormulario();
             
         } catch (error) {
-            console.error('Error cargando comentarios:', error);
+            console.error('❌ Error en cargarComentarios:', error);
+            document.getElementById('lista-comentarios').innerHTML = `
+                <div class="alert alert-danger">
+                    Error al cargar comentarios: ${error.message}
+                </div>
+            `;
         }
     },
 
@@ -36,20 +84,16 @@ const ComentarioController = {
         const form = document.getElementById('formComentario');
         
         if (!form) {
-            console.warn('⚠️ Formulario de comentarios no encontrado');
+            console.error('❌ No se encontró #formComentario');
             return;
         }
         
-        // Remover event listeners anteriores
-        const nuevoForm = form.cloneNode(true);
-        form.parentNode.replaceChild(nuevoForm, form);
-        
-        nuevoForm.addEventListener('submit', async (e) => {
+        form.onsubmit = async (e) => {
             e.preventDefault();
             await this.enviarComentario();
-        });
+        };
         
-        console.log('✅ Formulario de comentarios configurado');
+        console.log('✅ Formulario configurado');
     },
 
     async enviarComentario() {
@@ -58,15 +102,15 @@ const ComentarioController = {
             const contenido = document.getElementById('comentario').value.trim();
             
             if (!nombre || !contenido) {
-                alert('Por favor completa todos los campos');
+                alert('Completa todos los campos');
                 return;
             }
-
+            
             if (nombre.length < 3) {
                 alert('El nombre debe tener al menos 3 caracteres');
                 return;
             }
-
+            
             if (contenido.length < 5) {
                 alert('El comentario debe tener al menos 5 caracteres');
                 return;
@@ -78,24 +122,63 @@ const ComentarioController = {
                 comentario: contenido
             });
             
-            console.log('📝 Enviando comentario:', comentario);
-            
             await ComentarioService.crearComentario(comentario);
             
-            // Limpiar formulario
             document.getElementById('nombreUsuario').value = '';
             document.getElementById('comentario').value = '';
             
-            // Mostrar mensaje de éxito
-            alert('✅ Comentario enviado correctamente');
-            
-            // Recargar comentarios
             await this.cargarComentarios(this.dispositivoActual);
             
         } catch (error) {
-            console.error('Error al enviar comentario:', error);
-            alert('❌ Error al enviar comentario: ' + error.message);
+            console.error('❌ Error al enviar:', error);
+            alert('Error: ' + error.message);
         }
+    },
+
+    async editarComentario(id) {
+        const nuevoNombre = prompt('Editar nombre:');
+        if (!nuevoNombre) return;
+        
+        const nuevoContenido = prompt('Editar comentario:');
+        if (!nuevoContenido) return;
+        
+        try {
+            await ComentarioService.updateComentario(id, {
+                nombre_usuario: nuevoNombre,
+                comentario: nuevoContenido
+            });
+            
+            await this.cargarComentarios(this.dispositivoActual);
+            
+        } catch (error) {
+            alert('Error al editar: ' + error.message);
+        }
+    },
+
+    confirmarEliminar(id, usuario) {
+        if (confirm(`¿Eliminar comentario de ${usuario}?`)) {
+            this.eliminarComentario(id);
+        }
+    },
+
+    async eliminarComentario(id) {
+        try {
+            await ComentarioService.deleteComentario(id);
+            await this.cargarComentarios(this.dispositivoActual);
+        } catch (error) {
+            alert('Error al eliminar: ' + error.message);
+        }
+    },
+
+    escapeHTML(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    },
+
+    formatearFecha(fecha) {
+        return new Date(fecha).toLocaleString('es-ES');
     }
 };
 

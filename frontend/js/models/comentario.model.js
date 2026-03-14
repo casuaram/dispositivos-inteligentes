@@ -3,12 +3,11 @@ class Comentario {
     constructor(data = {}) {
         this.id = data.id || null;
         this.dispositivo_id = data.dispositivo_id || null;
-        this.nombre_usuario = data.nombre_usuario || '';  
-        this.comentario = data.comentario || '';          
+        this.nombre_usuario = data.nombre_usuario || '';
+        this.comentario = data.comentario || '';
         this.fecha = data.fecha || new Date().toISOString();
     }
 
-    // Formatear fecha
     getFechaFormateada() {
         return new Date(this.fecha).toLocaleDateString('es-ES', {
             year: 'numeric',
@@ -19,10 +18,10 @@ class Comentario {
         });
     }
 
-    // Validar comentario
     esValido() {
         return this.nombre_usuario.trim() !== '' && this.comentario.trim() !== '';
     }
 }
 
+// Hacer disponible globalmente
 window.Comentario = Comentario;
