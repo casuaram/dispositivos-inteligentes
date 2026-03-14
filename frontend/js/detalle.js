@@ -292,7 +292,7 @@ function copiarEnlace() {
     });
 }
 
-// Hacer funciones globales
+// Hacer funciones globales 
 window.compartirWhatsApp = compartirWhatsApp;
 window.compartirFacebook = compartirFacebook;
 window.copiarEnlace = copiarEnlace;
