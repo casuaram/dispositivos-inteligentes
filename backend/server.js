@@ -53,7 +53,7 @@ app.get('/api/dispositivos', async (req, res) => {
             paramIndex++;
         }
 
-        // Filtro por marca (ej: 'Apple', 'Samsung')
+        // Filtro por marca (ej: 'Apple', 'Samsung') 
         if (marca && marca.trim() !== '') {
             query += ` AND marca = $${paramIndex}`;
             params.push(marca);

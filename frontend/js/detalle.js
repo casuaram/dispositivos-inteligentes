@@ -269,7 +269,7 @@ function mostrarAlerta(mensaje, tipo) {
     setTimeout(() => {
         alertaDiv.remove();
     }, 5000);
-}
+} 
 
 // NUEVAS FUNCIONES: Compartir en redes sociales
 function compartirWhatsApp() {

@@ -374,7 +374,7 @@ function mostrarError(mensaje) {
     setTimeout(() => {
         alerta.classList.add('d-none');
     }, 5000);
-}
+} 
 
 // Hacer funciones globales
 window.verDispositivo = verDispositivo;

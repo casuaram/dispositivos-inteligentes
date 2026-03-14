@@ -259,7 +259,7 @@ function limpiarFiltros() {
     if (buscarInput) buscarInput.value = '';
     
     cargarDispositivos({});
-}
+} 
 
 // Hacer funciones globales para usar desde el HTML
 window.limpiarFiltros = limpiarFiltros;
