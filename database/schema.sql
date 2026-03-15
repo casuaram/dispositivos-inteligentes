@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict EEfFCJOkFRjDZeRBQ4NDyRRPDk5vnBR3MyP1hZd2MM6DzgTtegBiAWqRyH6nPIZ
+--\restrict EEfFCJOkFRjDZeRBQ4NDyRRPDk5vnBR3MyP1hZd2MM6DzgTtegBiAWqRyH6nPIZ
 
 -- Dumped from database version 18.2
 -- Dumped by pg_dump version 18.1
@@ -211,5 +211,5 @@ ALTER TABLE ONLY public.comentarios
 -- PostgreSQL database dump complete
 --
 
-\unrestrict EEfFCJOkFRjDZeRBQ4NDyRRPDk5vnBR3MyP1hZd2MM6DzgTtegBiAWqRyH6nPIZ
+--\unrestrict EEfFCJOkFRjDZeRBQ4NDyRRPDk5vnBR3MyP1hZd2MM6DzgTtegBiAWqRyH6nPIZ
 
