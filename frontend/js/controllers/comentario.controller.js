@@ -98,6 +98,13 @@ const ComentarioController = {
 
     async enviarComentario() {
         try {
+            // Requiere sesión para comentar
+            if (typeof AuthUtils !== 'undefined' && !AuthUtils.isAuthenticated()) {
+                const returnUrl = 'detalle.html?id=' + this.dispositivoActual;
+                window.location.href = 'login.html?redirect=' + encodeURIComponent(returnUrl);
+                return;
+            }
+            
             const nombre = document.getElementById('nombreUsuario').value.trim();
             const contenido = document.getElementById('comentario').value.trim();
             
@@ -131,7 +138,12 @@ const ComentarioController = {
             
         } catch (error) {
             console.error('❌ Error al enviar:', error);
-            alert('Error: ' + error.message);
+            if (error.message && (error.message.includes('Token') || error.message.includes('401') || error.message.includes('autenticación'))) {
+                const returnUrl = 'detalle.html?id=' + this.dispositivoActual;
+                window.location.href = 'login.html?redirect=' + encodeURIComponent(returnUrl);
+            } else {
+                alert('Error: ' + error.message);
+            }
         }
     },
 

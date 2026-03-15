@@ -2,12 +2,16 @@
 const express = require('express');
 const router = express.Router();
 const DispositivoController = require('../controllers/dispositivos.controller');
+const authMiddleware = require('../middleware/auth.middleware');
+const { requireRole } = require('../middleware/roles.middleware');
 
-// Definir todas las rutas para dispositivos
-router.get('/', DispositivoController.getAll);           // GET all + filtros
-router.get('/:id', DispositivoController.getById);      // GET one by ID
-router.post('/', DispositivoController.create);          // POST create
-router.put('/:id', DispositivoController.update);        // PUT update
-router.delete('/:id', DispositivoController.delete);     // DELETE remove
+// Rutas públicas (lectura)
+router.get('/', DispositivoController.getAll);
+router.get('/:id', DispositivoController.getById);
+
+// Rutas protegidas: solo ADMIN
+router.post('/', authMiddleware, requireRole('ADMIN'), DispositivoController.create);
+router.put('/:id', authMiddleware, requireRole('ADMIN'), DispositivoController.update);
+router.delete('/:id', authMiddleware, requireRole('ADMIN'), DispositivoController.delete);
 
 module.exports = router;

@@ -2,13 +2,21 @@
 const ComentarioService = {
     BASE_URL: 'http://localhost:3000/api',
 
+    getHeaders() {
+        const headers = { 'Content-Type': 'application/json' };
+        if (typeof AuthUtils !== 'undefined' && AuthUtils.getToken()) {
+            headers['Authorization'] = 'Bearer ' + AuthUtils.getToken();
+        }
+        return headers;
+    },
+
     async getComentarios(dispositivoId) {
         try {
             console.log(`📡 GET ${this.BASE_URL}/comentarios?dispositivo_id=${dispositivoId}`);
             
             const response = await fetch(`${this.BASE_URL}/comentarios?dispositivo_id=${dispositivoId}`, {
                 method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
+                headers: this.getHeaders(),
                 mode: 'cors'
             });
             
@@ -34,7 +42,7 @@ const ComentarioService = {
             
             const response = await fetch(`${this.BASE_URL}/comentarios`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: this.getHeaders(),
                 mode: 'cors',
                 body: JSON.stringify({
                     dispositivo_id: comentario.dispositivo_id,
@@ -61,7 +69,7 @@ const ComentarioService = {
         try {
             const response = await fetch(`${this.BASE_URL}/comentarios/${id}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: this.getHeaders(),
                 mode: 'cors',
                 body: JSON.stringify(datos)
             });
@@ -84,7 +92,7 @@ const ComentarioService = {
         try {
             const response = await fetch(`${this.BASE_URL}/comentarios/${id}`, {
                 method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
+                headers: this.getHeaders(),
                 mode: 'cors'
             });
             

@@ -3,11 +3,13 @@ const ApiService = {
     // Configuración
     BASE_URL: 'http://localhost:3000/api',
     
-    // Headers por defecto
+    // Headers por defecto (incluye Authorization si hay token)
     getHeaders() {
-        return {
-            'Content-Type': 'application/json',
-        };
+        const headers = { 'Content-Type': 'application/json' };
+        if (typeof AuthUtils !== 'undefined' && AuthUtils.getToken()) {
+            headers['Authorization'] = 'Bearer ' + AuthUtils.getToken();
+        }
+        return headers;
     },
 
     // Manejo de errores
@@ -62,7 +64,7 @@ const ApiService = {
             
             const response = await fetch(`${this.BASE_URL}/dispositivos/${id}`, {
                 method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
+                headers: this.getHeaders(),
                 mode: 'cors'
             });
             

@@ -1,11 +1,14 @@
 // backend/server.js
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 const express = require('express');
 const cors = require('cors');
 const dispositivosRoutes = require('./routes/dispositivos.routes');
-const comentariosRoutes = require('./routes/comentarios.routes'); 
+const comentariosRoutes = require('./routes/comentarios.routes');
+const authRoutes = require('./routes/auth.routes');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Middlewares
 app.use(cors());
@@ -13,6 +16,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Rutas
+app.use('/api/auth', authRoutes);
 app.use('/api/dispositivos', dispositivosRoutes);
 app.use('/api/comentarios', comentariosRoutes); 
 

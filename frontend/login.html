@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Dispositivos Inteligentes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/estilo.css">
+    <style>
+        .login-container {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-card {
+            max-width: 400px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-microchip me-2"></i>Dispositivos Inteligentes
+            </a>
+            <a class="nav-link text-white" href="index.html">
+                <i class="fas fa-home me-1"></i>Volver al catálogo
+            </a>
+        </div>
+    </nav>
+
+    <div class="container login-container">
+        <div class="login-card card shadow">
+            <div class="card-header bg-primary text-white text-center py-3">
+                <h4 class="mb-0">
+                    <i class="fas fa-lock me-2"></i>Iniciar Sesión
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <div id="mensajeError" class="alert alert-danger d-none" role="alert"></div>
+                
+                <form id="formLogin">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" 
+                               placeholder="correo@ejemplo.com" required autocomplete="email">
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" id="password" 
+                               placeholder="••••••••" required autocomplete="current-password">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100" id="btnLogin">
+                        <i class="fas fa-sign-in-alt me-2"></i>Entrar
+                    </button>
+                </form>
+
+                <hr>
+                <p class="text-muted small mb-0">
+                    <strong>Credenciales de prueba:</strong><br>
+                    Admin: admin@dispositivos.com / admin123<br>
+                    Usuario: normal@dispositivos.com / normal123
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/utils/auth.js"></script>
+    <script>
+        document.getElementById('formLogin').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const btnLogin = document.getElementById('btnLogin');
+            const mensajeError = document.getElementById('mensajeError');
+
+            mensajeError.classList.add('d-none');
+            btnLogin.disabled = true;
+            btnLogin.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Entrando...';
+
+            try {
+                const response = await fetch('http://localhost:3000/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    mode: 'cors',
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Error al iniciar sesión');
+                }
+
+                AuthUtils.setToken(data.token);
+                AuthUtils.setUsuario(data.usuario);
+
+                const params = new URLSearchParams(window.location.search);
+                const redirect = params.get('redirect');
+
+                // Redirigir según rol: ADMIN -> admin, NORMAL -> index (nunca admin)
+                if (data.usuario.rol === 'ADMIN') {
+                    window.location.href = redirect || 'admin.html';
+                } else {
+                    // NORMAL: index.html o redirect solo si no es admin
+                    const safeRedirect = (redirect && !redirect.includes('admin')) ? redirect : null;
+                    window.location.href = safeRedirect || 'index.html';
+                }
+            } catch (error) {
+                mensajeError.textContent = error.message;
+                mensajeError.classList.remove('d-none');
+                btnLogin.disabled = false;
+                btnLogin.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>Entrar';
+            }
+        });
+    </script>
+</body>
+</html>

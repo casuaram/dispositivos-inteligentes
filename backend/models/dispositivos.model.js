@@ -41,27 +41,27 @@ const DispositivoModel = {
 
     // Crear nuevo dispositivo
     async create(dispositivo) {
-        const { nombre, marca, tipo, precio, descripcion, fecha_lanzamiento, imagen_url } = dispositivo;
+        const { nombre, marca, tipo, precio, descripcion, fecha_lanzamiento, imagen_url, especificaciones } = dispositivo;
         const result = await pool.query(
             `INSERT INTO dispositivos 
-             (nombre, marca, tipo, precio, descripcion, fecha_lanzamiento, imagen_url) 
-             VALUES ($1, $2, $3, $4, $5, $6, $7) 
+             (nombre, marca, tipo, precio, descripcion, fecha_lanzamiento, imagen_url, especificaciones) 
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
              RETURNING *`,
-            [nombre, marca, tipo, precio, descripcion, fecha_lanzamiento, imagen_url]
+            [nombre, marca, tipo, precio, descripcion || null, fecha_lanzamiento || null, imagen_url || null, especificaciones || null]
         );
         return result.rows[0];
     },
 
     // Actualizar dispositivo
     async update(id, dispositivo) {
-        const { nombre, marca, tipo, precio, descripcion, fecha_lanzamiento, imagen_url } = dispositivo;
+        const { nombre, marca, tipo, precio, descripcion, fecha_lanzamiento, imagen_url, especificaciones } = dispositivo;
         const result = await pool.query(
             `UPDATE dispositivos 
              SET nombre = $1, marca = $2, tipo = $3, precio = $4, 
-                 descripcion = $5, fecha_lanzamiento = $6, imagen_url = $7
-             WHERE id = $8 
+                 descripcion = $5, fecha_lanzamiento = $6, imagen_url = $7, especificaciones = $8
+             WHERE id = $9 
              RETURNING *`,
-            [nombre, marca, tipo, precio, descripcion, fecha_lanzamiento, imagen_url, id]
+            [nombre, marca, tipo, precio, descripcion || null, fecha_lanzamiento || null, imagen_url || null, especificaciones || null, id]
         );
         return result.rows[0];
     },
